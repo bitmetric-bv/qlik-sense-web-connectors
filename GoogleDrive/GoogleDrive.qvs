@@ -1,0 +1,115 @@
+SUB GoogleDrive.Init(pLibrary.Metadata, pLibrary.Storage)
+
+	SET GoogleDrive.Library.Metadata = '$(pLibrary.Metadata)';
+    SET GoogleDrive.Library.Storage = '$(pLibrary.Storage)';  
+
+	
+    
+    TRACE >>> Caching Google Drive paths;
+    CALL GoogleDrive.ListFiles('trashed = false and mimeType = "application/vnd.google-apps.folder"', 'GoogleDrive.Temp.Folders');
+    
+    // Todo: check if GoogleDrive.Temp.Paths table exists and contains data.
+    
+    // Cache table containing a list of all folders and paths in Google Drive
+    [GoogleDrive.Folders]:
+    HIERARCHY(GoogleDrive.Folders.Id,
+              GoogleDrive.Folders.ParentId,
+              GoogleDrive.Folders.Name,
+              'GoogleDrive.Folders.ParentName',
+              GoogleDrive.Folders.Name,
+              'GoogleDrive.Folders.Path',
+              '/',
+              'GoogleDrive.Folders.PathDepth'
+    )
+  	LOAD
+    	id			AS GoogleDrive.Folders.Id,
+      	title		AS GoogleDrive.Folders.Name,
+      	parents_id	AS GoogleDrive.Folders.ParentId
+  	RESIDENT [GoogleDrive.Temp.Folders]
+    ;
+    
+    DROP TABLE [GoogleDrive.Temp.Folders];
+    
+    
+    [GoogleDrive.Map.FolderIdToPath]:
+    MAPPING LOAD
+    	[GoogleDrive.Folders.Id],
+        [GoogleDrive.Folders.Path]
+    RESIDENT [GoogleDrive.Folders]
+    ;
+    
+    
+    TRACE >>> Caching Google Drive files;
+    CALL GoogleDrive.ListFiles('trashed = false and mimeType != "application/vnd.google-apps.folder"', 'GoogleDrive.Temp.Files');
+    
+    
+    // Cache table containing a list of all files in Google Drive (and their corresponding path)
+    [GoogleDrive.Files]:
+    LOAD
+    	id																AS GoogleDrive.Files.Id,
+        title															AS GoogleDrive.Files.Filename,
+        fileExtension													AS GoogleDrive.Files.FileExtension,
+        fileSize														AS GoogleDrive.Files.FileSize,
+        parents_id														AS GoogleDrive.Files.FolderId,
+        applyMap('GoogleDrive.Map.FolderIdToPath', parents_id, null())	AS GoogleDrive.Files.Path
+    RESIDENT [GoogleDrive.Temp.Files]
+    ;
+    
+    DROP TABLE [GoogleDrive.Temp.Files];
+    
+    
+
+END SUB
+
+
+SUB GoogleDrive.Destroy
+
+	DROP TABLE GoogleDrive.Folders;
+    DROP TABLE GoogleDrive.Files;
+
+	LET GoogleDrive.Library.Metadata = null();
+    LET GoogleDrive.Library.Storage = null();
+    
+END SUB
+
+
+
+SUB GoogleDrive.ListFiles(pQuery, pTableReturn)
+
+	// Runs a ListFiles query, filtered by pQuery (or blank) and returns table pTableReturn
+
+	LIB CONNECT TO '$(GoogleDrive.Library.Metadata)';
+
+    [$(pTableReturn)]:
+    SELECT *
+    FROM ListFiles
+    WITH PROPERTIES (
+      query='$(pQuery)'
+    )
+    ;
+    
+    DISCONNECT;
+
+END SUB
+
+
+
+SUB GoogleDrive.GetFolderId(pPath, pVarReturn)
+
+	// Fetch the Folder ID for a pPath
+  
+	[GoogleDrive.Temp.Folder]:
+  	LOAD
+  		[GoogleDrive.Folders.Id]
+  	RESIDENT [GoogleDrive.Folders]
+    WHERE
+    	lower([GoogleDrive.Folders.Path]) = lower('$(pPath)')
+	;
+  
+  LET $(pVarReturn) = peek('GoogleDrive.Folders.Id', 0, 'GoogleDrive.Temp.Folder');
+  
+  WHEN '$($(pVarReturn))' = '' SET $(pVarReturn) = 'NOT_FOUND';
+  
+  DROP TABLE [GoogleDrive.Temp.Folder];
+
+END SUB
