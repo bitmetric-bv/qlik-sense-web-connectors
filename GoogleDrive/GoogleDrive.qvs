@@ -1,12 +1,11 @@
 SUB GoogleDrive.Init(pLibrary.Metadata, pLibrary.Storage)
 
-	SET GoogleDrive.Library.Metadata = '$(pLibrary.Metadata)';
-    SET GoogleDrive.Library.Storage = '$(pLibrary.Storage)';  
-
-	
+	SET GoogleDrive.DataConnection.Metadata = '$(pLibrary.Metadata)';
+    SET GoogleDrive.DataConnection.Storage = '$(pLibrary.Storage)';
+    SET GoogleDrive.ActiveFolder.IsSet = 0;
     
     TRACE >>> Caching Google Drive paths;
-    CALL GoogleDrive.ListFiles('trashed = false and mimeType = "application/vnd.google-apps.folder"', 'GoogleDrive.Temp.Folders');
+    CALL GoogleDrive.ListFiles('trashed = false and mimeType = "application/vnd.google-apps.folder"', 'GoogleDrive.Folders.Temp');
     
     // Todo: check if GoogleDrive.Temp.Paths table exists and contains data.
     
@@ -25,10 +24,10 @@ SUB GoogleDrive.Init(pLibrary.Metadata, pLibrary.Storage)
     	id			AS GoogleDrive.Folders.Id,
       	title		AS GoogleDrive.Folders.Name,
       	parents_id	AS GoogleDrive.Folders.ParentId
-  	RESIDENT [GoogleDrive.Temp.Folders]
+  	RESIDENT [GoogleDrive.Folders.Temp]
     ;
     
-    DROP TABLE [GoogleDrive.Temp.Folders];
+    DROP TABLE [GoogleDrive.Folders.Temp];
     
     
     [GoogleDrive.Map.FolderIdToPath]:
@@ -40,7 +39,7 @@ SUB GoogleDrive.Init(pLibrary.Metadata, pLibrary.Storage)
     
     
     TRACE >>> Caching Google Drive files;
-    CALL GoogleDrive.ListFiles('trashed = false and mimeType != "application/vnd.google-apps.folder"', 'GoogleDrive.Temp.Files');
+    CALL GoogleDrive.ListFiles('trashed = false and mimeType != "application/vnd.google-apps.folder"', 'GoogleDrive.Files.Temp');
     
     
     // Cache table containing a list of all files in Google Drive (and their corresponding path)
@@ -52,23 +51,27 @@ SUB GoogleDrive.Init(pLibrary.Metadata, pLibrary.Storage)
         fileSize														AS GoogleDrive.Files.FileSize,
         parents_id														AS GoogleDrive.Files.FolderId,
         applyMap('GoogleDrive.Map.FolderIdToPath', parents_id, null())	AS GoogleDrive.Files.Path
-    RESIDENT [GoogleDrive.Temp.Files]
+    RESIDENT [GoogleDrive.Files.Temp]
     ;
     
-    DROP TABLE [GoogleDrive.Temp.Files];
-    
-    
+    DROP TABLE [GoogleDrive.Files.Temp]; 
 
 END SUB
+
 
 
 SUB GoogleDrive.Destroy
 
 	DROP TABLE GoogleDrive.Folders;
     DROP TABLE GoogleDrive.Files;
+    WHEN GoogleDrive.ActiveFolder.IsSet DROP TABLE [GoogleDrive.ActiveFolder.Files];
 
-	LET GoogleDrive.Library.Metadata = null();
-    LET GoogleDrive.Library.Storage = null();
+	LET GoogleDrive.DataConnection.Metadata = null();
+    LET GoogleDrive.DataConnection.Storage = null();
+    LET GoogleDrive.ActiveFolder.IsSet = null();
+    LET GoogleDrive.ActiveFolder.Id = null();
+    LET GoogleDrive.ActiveFolder.Path = null();
+    LET GoogleDrive.ActiveFolder.NoOfFiles = null();
     
 END SUB
 
@@ -78,7 +81,7 @@ SUB GoogleDrive.ListFiles(pQuery, pTableReturn)
 
 	// Runs a ListFiles query, filtered by pQuery (or blank) and returns table pTableReturn
 
-	LIB CONNECT TO '$(GoogleDrive.Library.Metadata)';
+	LIB CONNECT TO '$(GoogleDrive.DataConnection.Metadata)';
 
     [$(pTableReturn)]:
     SELECT *
@@ -98,7 +101,7 @@ SUB GoogleDrive.GetFolderId(pPath, pVarReturn)
 
 	// Fetch the Folder ID for a pPath
   
-	[GoogleDrive.Temp.Folder]:
+	[GoogleDrive.GetFolderId.Folder]:
   	LOAD
   		[GoogleDrive.Folders.Id]
   	RESIDENT [GoogleDrive.Folders]
@@ -106,10 +109,155 @@ SUB GoogleDrive.GetFolderId(pPath, pVarReturn)
     	lower([GoogleDrive.Folders.Path]) = lower('$(pPath)')
 	;
   
-  LET $(pVarReturn) = peek('GoogleDrive.Folders.Id', 0, 'GoogleDrive.Temp.Folder');
+  LET $(pVarReturn) = peek('GoogleDrive.Folders.Id', 0, 'GoogleDrive.GetFolderId.Folder');
   
   WHEN '$($(pVarReturn))' = '' SET $(pVarReturn) = 'NOT_FOUND';
   
-  DROP TABLE [GoogleDrive.Temp.Folder];
+  DROP TABLE [GoogleDrive.GetFolderId.Folder];
+
+END SUB
+
+
+
+SUB GoogleDrive.FolderExists(pPath, pVarReturn)
+
+	// Check if a given path exists
+	CALL GoogleDrive.GetFolderId('$(pPath)', 'GoogleDrive.FolderExists.FolderId');
+    
+    IF '$(GoogleDrive.FolderExists.FolderId)' = 'NOT_FOUND' THEN
+      LET $(pVarReturn) = 0;
+    ELSE
+      LET $(pVarReturn) = -1;
+    END IF
+    
+    LET GoogleDrive.FolderExists.FolderId = null();
+
+END SUB
+
+
+
+SUB GoogleDrive.SetActiveFolder(pPath)
+
+	WHEN GoogleDrive.ActiveFolder.IsSet DROP TABLE [GoogleDrive.ActiveFolder.Files];
+
+	// Reset the active folder
+	LET GoogleDrive.ActiveFolder.IsSet = 0;
+    LET GoogleDrive.ActiveFolder.Id = null();
+    LET GoogleDrive.ActiveFolder.Path = null();
+    LET GoogleDrive.ActiveFolder.NoOfFiles = null();
+
+
+	// Check if the folder exists
+	CALL GoogleDrive.FolderExists('$(pPath)', 'GoogleDrive.ActiveFolder.IsSet');
+    
+    IF GoogleDrive.ActiveFolder.IsSet THEN
+    
+        CALL GoogleDrive.GetFolderId('$(pPath)', 'GoogleDrive.ActiveFolder.Id');
+        LET GoogleDrive.ActiveFolder.Path = '$(pPath)';         
+        CALL GoogleDrive.GetFilesInPath('$(pPath)', 'GoogleDrive.ActiveFolder.Files');
+        
+        LET GoogleDrive.ActiveFolder.NoOfFiles = NoOfRows('GoogleDrive.ActiveFolder.Files');
+    
+    END IF
+
+END SUB
+
+
+
+SUB GoogleDrive.ActiveFolder.GetFilenameByIndex(pIndex, pVarReturn)
+
+	// Fetch the filename of a file in the active folder, based on the index in the
+    // GoogleDrive.ActiveFolder.Files table.
+    LET $(pVarReturn) = peek('GoogleDrive.ActiveFolder.Files.Filename', $(pIndex), 'GoogleDrive.ActiveFolder.Files');
+
+END SUB
+
+
+
+SUB GoogleDrive.GetFileId(pPath, pFilename, pVarReturn)
+
+	// Fetch the Folder ID for a file in a path
+
+	[GoogleDrive.GetFileId.File]:
+    LOAD
+    	[GoogleDrive.Files.Id]
+    RESIDENT [GoogleDrive.Files]
+    WHERE [GoogleDrive.Files.Filename] = '$(pFilename)'
+    AND [GoogleDrive.Files.Path] = '$(pPath)'
+    ;
+    
+    LET $(pVarReturn) = peek('GoogleDrive.Files.Id', 0, 'GoogleDrive.GetFileId.File');
+  
+  WHEN '$($(pVarReturn))' = '' SET $(pVarReturn) = 'NOT_FOUND';
+  
+  DROP TABLE [GoogleDrive.GetFileId.File];
+
+END SUB
+
+
+
+SUB GoogleDrive.GetFilesInPath(pPath, pTableReturn)
+
+	CALL GoogleDrive.FolderExists('$(pPath)', 'GoogleDrive.GetFilesInPath.FolderExists');
+    
+    IF GoogleDrive.GetFilesInPath.FolderExists THEN
+    
+    	TRACE >>> Getting file list for $(pPath);
+        
+    	[$(pTableReturn)]:
+        LOAD
+        	[GoogleDrive.Files.Id]				AS [$(pTableReturn).Id],
+            [GoogleDrive.Files.Filename]		AS [$(pTableReturn).Filename],
+            [GoogleDrive.Files.FileExtension]	AS [$(pTableReturn).FileExtension],
+            [GoogleDrive.Files.FileSize]		AS [$(pTableReturn).FileSize]
+        RESIDENT [GoogleDrive.Files]
+        WHERE [GoogleDrive.Files.Path] = '$(pPath)'
+        ;
+    
+    END IF
+    
+    LET GoogleDrive.GetFilesInPath.FolderExists = null();
+
+END SUB
+
+
+
+SUB GoogleDrive.FileExists(pPath, pFilename, pVarReturn)
+
+	// Check if a given file exists within a path
+	CALL GoogleDrive.GetFileId('$(pPath)', '$(pFilename)', 'GoogleDrive.FileExists.FileId');
+    
+    IF '$(GoogleDrive.FileExists.FileId)' = 'NOT_FOUND' THEN
+      LET $(pVarReturn) = 0;
+    ELSE
+      LET $(pVarReturn) = -1;
+    END IF
+    
+    LET GoogleDrive.FileExists.FileId = null();
+
+END SUB
+
+
+
+SUB GoogleDrive.StoreQVD(pTable, pPath, pFilename, pDropAfterStore)
+
+	// Store a table to Google Drive as a QVD
+    
+    WHEN '$(pDropAfterStore)' = '' SET pDropAfterStore = 0;	// Optional, set to not drop if not provided
+    
+    CALL  GoogleDrive.FolderExists('$(pPath)', 'GoogleDrive.StoreTable.FolderExists');
+    
+    IF GoogleDrive.StoreTable.FolderExists THEN
+    	
+        CALL GoogleDrive.GetFolderId('$(pPath)', 'GoogleDrive.StoreTable.FolderId');
+		STORE [$(pTable)] INTO 'lib://$(GoogleDrive.DataConnection.Storage)/$(GoogleDrive.StoreTable.FolderId)/$(pFilename)' (qvd);
+        
+        WHEN pDropAfterStore DROP TABLE [$(pTable)];
+
+	END IF
+    
+    LET GoogleDrive.StoreTable.FolderExists = null();
+    LET GoogleDrive.StoreTable.FolderId = null();
+
 
 END SUB
