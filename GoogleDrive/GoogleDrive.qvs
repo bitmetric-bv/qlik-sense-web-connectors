@@ -1,7 +1,7 @@
-SUB GoogleDrive.Init(pLibrary.Metadata, pLibrary.Storage)
+SUB GoogleDrive.Init(pDataConnection.Metadata, pDataConnection.Storage)
 
-	SET GoogleDrive.DataConnection.Metadata = '$(pLibrary.Metadata)';
-    SET GoogleDrive.DataConnection.Storage = '$(pLibrary.Storage)';
+	SET GoogleDrive.DataConnection.Metadata = '$(pDataConnection.Metadata)';
+    SET GoogleDrive.DataConnection.Storage = '$(pDataConnection.Storage)';
     SET GoogleDrive.ActiveFolder.IsSet = 0;
     
     TRACE >>> Caching Google Drive paths;
