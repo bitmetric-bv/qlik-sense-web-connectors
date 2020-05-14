@@ -78,9 +78,15 @@ GoogleDrive.qvs contains the following methods (subroutines)
 
 **Description:** The 'Active Folder' contains the present working directory in Google Drive. Using this can be beneficial when reading/storing many different files from a single folder as the *GoogleDrive.ActiveFolder* properties offer additional metadata to work with the files in the folder.
 <br />
-The *GoogleDrive.SetActiveFolder* method lets you set and change the present working directory. 
+The *GoogleDrive.SetActiveFolder* method lets you set and change the present working directory. This populates the Qlik table *\[GoogleDrive.ActiveFolder.Files\]* with a list of the files in the active folder. Additionally, it sets the following properties:
+
+* *GoogleDrive.ActiveFolder.IsSet* : True (-1) when an active folder is set, or false (0) when it is not.
+* *GoogleDrive.ActiveFolder.Id* : The Id for the active folder in Google Drive.
+* *GoogleDrive.ActiveFolder.Path* : The (human-readable) path of the active folder.
+* *GoogleDrive.ActiveFolder.NoOfFiles* : The number of files in the active folder, can be used to loop through the files in the folder.
 <br />
 <br />
+
 |Parameter|Description|In/Out|Optional|
 |--|--|--|--|
 |pPath|The path of the folder to set the Active Folder to, without leading or trailing backslashes.|In|No|
@@ -88,4 +94,30 @@ The *GoogleDrive.SetActiveFolder* method lets you set and change the present wor
 **Example:**
 
     CALL GoogleDrive.SetActiveFolder('Qlik/QVD/Transformed');
+<br />
+
+### GoogleDrive.ActiveFolder.GetFilenameByIndex
+
+**Description:** Returns the name of the file in the place identified by the *pIndex* parameter. Outputs the name to the variable identified by the *pVarReturn* parameter.
+<br />
+<br />
+|Parameter|Description|In/Out|Optional|
+|--|--|--|--|
+|pIndex|Index of the file in the folder. Possible values range from zero to *GoogleDrive.ActiveFolder.NoOfFiles - 1* |In|No|
+|pVarReturn|Name of the variable where the name of the file is output to|Out|No|
+
+**Example:**
+
+    FOR i = 0 TO $(GoogleDrive.ActiveFolder.NoOfFiles) - 1
+    
+        CALL ActiveFolder.GetFilenameByIndex($(i), 'vFilename');
+        
+        Data:
+        LOAD
+            *
+        FROM [lib://$(GoogleDrive.DataConnection.Storage)/$(GoogleDrive.ActiveFolder.Id)/$(vFilename)]
+        (qvd)
+        ;
+        
+    NEXT
 <br />
