@@ -33,6 +33,7 @@ GoogleDrive.qvs contains the following methods (subroutines)
 |--|--|--|--|
 |pQuery|Query to run through the Google Drive metadata connector, see .... for syntax.|In|No|
 |pTableReturn|Name of the table to place the results in.|Out|No| 
+
 **Example:**
 
     CALL GoogleDrive.ListFiles('trashed = false and mimeType != "application/vnd.google-apps.folder"', 'GoogleDrive.Files.Temp');
