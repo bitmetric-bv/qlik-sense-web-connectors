@@ -1,3 +1,4 @@
+![alt text](https://github.com/bitmetric-bv/qlik-sense-web-connectors/blob/master/GoogleDrive/google-drive-logo.png "Reusable subroutines for dealing with Google Drive files and folders in Qlik Sense, using the Google Drive Connectors in Qlik.")
 # Google Drive
 Reusable subroutines for dealing with Google Drive files in Qlik Sense.
 
