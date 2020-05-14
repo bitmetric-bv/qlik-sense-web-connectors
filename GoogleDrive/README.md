@@ -7,6 +7,7 @@ GoogleDrive.qvs contains the following methods (subroutines)
 
 
 **GoogleDrive.Init**
+
 Initializes the Google Drive by caching the folders and files.
 
 
