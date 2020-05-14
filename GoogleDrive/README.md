@@ -7,8 +7,9 @@ GoogleDrive.qvs contains the following methods (subroutines)
 ### GoogleDrive.Init
 
 **Description:** Initializes the Google Drive by caching the folders and files. Folders are cached in the Qlik table \[GoogleDrive.Folders\] and files are cached in the Qlik table \[GoogleDrive.Files\]. Run this before calling the other subroutines.  
-\
-\
+  
+  
+  
 |Parameter|Description|In/Out|Optional|
 |--|--|--|--|
 |pDataConnection.Metadata|Name of the Data Connection for the Google Drive metadata connector, without lib:// prefix.|In|No|
