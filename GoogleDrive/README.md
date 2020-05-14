@@ -36,5 +36,5 @@ GoogleDrive.qvs contains the following methods (subroutines)
 
 **Example:**
 
-    CALL GoogleDrive.ListFiles('trashed = false and mimeType != "application/vnd.google-apps.folder"', 'GoogleDrive.Files.Temp');
+    CALL GoogleDrive.ListFiles('trashed = false', 'GoogleDrive.Files.Temp');
 <br />
