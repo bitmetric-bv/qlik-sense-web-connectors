@@ -1,22 +1,12 @@
 # Google Drive
 Reusable subroutines for dealing with Google Drive files in Qlik Sense.
 
-
 ## Methods
 GoogleDrive.qvs contains the following methods (subroutines)
 
-
-
-<<<<<<< HEAD
 ### GoogleDrive.Init
 
 **Description:** Initializes the Google Drive by caching the folders and files. Folders are cached in the Qlik table \[GoogleDrive.Folders\] and files are cached in the Qlik table \[GoogleDrive.Files\]. Run this before calling the other subroutines.
-=======
-**GoogleDrive.Init**
-
-Initializes the Google Drive by caching the folders and files.
->>>>>>> c229c8684d84fb7de215ae0f033b9fb1bd02c300
-
 
 |Parameter|Description|In/Out|Optional|
 |--|--|--|--|
@@ -26,7 +16,6 @@ Initializes the Google Drive by caching the folders and files.
 **Example:**
 
     CALL GoogleDrive.Init('Google Drive (metadata)', 'Google Drive (storage)');
-
 
 ### GoogleDrive.Destroy
 
