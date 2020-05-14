@@ -253,6 +253,8 @@ SUB GoogleDrive.StoreQVD(pTable, pPath, pFilename, pDropAfterStore)
     	
         CALL GoogleDrive.GetFolderId('$(pPath)', 'GoogleDrive.StoreTable.FolderId');
 		STORE [$(pTable)] INTO 'lib://$(GoogleDrive.DataConnection.Storage)/$(GoogleDrive.StoreTable.FolderId)/$(pFilename)' (qvd);
+
+        // To-do: add the file to the list of files after storing.
         
         WHEN pDropAfterStore DROP TABLE [$(pTable)];
 
