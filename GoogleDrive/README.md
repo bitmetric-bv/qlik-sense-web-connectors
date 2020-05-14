@@ -121,3 +121,70 @@ The *GoogleDrive.SetActiveFolder* method lets you set and change the present wor
         
     NEXT
 <br />
+
+### GoogleDrive.GetFileId
+
+**Description:** Returns the Id for the file specified by the *pFilename* parameter, located in the folder specified by the *pPath* parameter. The result is placed in the variable specified in the *pVarReturn* parameter. If no matching Id was found, the value NOT_FOUND is returned.
+<br />
+<br />
+|Parameter|Description|In/Out|Optional|
+|--|--|--|--|
+|pPath|The path of the folder, without leading or trailing backslashes.|In|No|
+|pFilename|The filename for which to get the Id.|In|No|
+|pVarReturn|The name of the variable to store the resulting Id in.|Out|No| 
+
+**Example:**
+
+    CALL GoogleDrive.GetFileId('Qlik/QVD/Transformed', 'Sales.qvd', 'vFolderId');
+<br />
+
+### GoogleDrive.FileExists
+
+**Description:** Checks if the file specified by the *pFilename* parameter and located in the folder specified by the *pPath* parameter exists. Outputs the result -1 (true) or 0 (false) to the variable specified by the *pVarReturn* parameter.
+<br />
+<br />
+|Parameter|Description|In/Out|Optional|
+|--|--|--|--|
+|pPath|The path of the folder, without leading or trailing backslashes.|In|No|
+|pFilename|The filename to check exists.|In|No|
+|pVarReturn|The name of the variable to store the result in, 0 for false or -1 for true.|Out|No| 
+
+**Example:**
+
+    CALL GoogleDrive.FileExists('Qlik/QVD/Transformed', 'Sales.qvd', 'vFolderId');
+<br />
+
+### GoogleDrive.GetFilesInPath
+
+**Description:** Returns a table (specified by the *pTableReturn* parameter) containing the Id, Filename, FileExtension and FileSize for all files located in the folder specified by the *pPath* parameter.
+<br />
+<br />
+|Parameter|Description|In/Out|Optional|
+|--|--|--|--|
+|pPath|The path of the folder, without leading or trailing backslashes.|In|No|
+|pTableReturn|The name of the table to store the file list in.|Out|No| 
+
+**Example:**
+
+    CALL GoogleDrive.GetFilesInPath('Qlik/QVD/Transformed', 'TableTransformedFiles');
+<br />
+
+### GoogleDrive.StoreQVD
+
+**Description:** Stores the table specified by the *pTable* parameter to the folder (specified by *pPath*) and filename (specified by *pFilename*). Optionally can drop the table after the file is stored, by providing the *pDropAfterStore* parameter.
+<br />
+<br />
+|Parameter|Description|In/Out|Optional|
+|--|--|--|--|
+|pTable|The name of the Qlik table.|In|No|
+|pPath|The path of the output folder, without leading or trailing backslashes.|In|No|
+|pFilename|The name of the output file, including extension.|In|No| 
+|pDropAfterStore|Boolean indicating if the table should be dropped after storing. -1 for true, 0 for false.|In|Yes| 
+
+**Example:**
+
+    CALL GoogleDrive.StoreQVD('Sales', Qlik/QVD/Transformed', 'Sales.qvd', -1);  // Store and drop table
+    
+    CALL GoogleDrive.StoreQVD('Sales', Qlik/QVD/Transformed', 'Sales.qvd');      // Store and keep table
+    CALL GoogleDrive.StoreQVD('Sales', Qlik/QVD/Transformed', 'Sales.qvd', 0);   // Store and keep table
+<br />
