@@ -184,7 +184,6 @@ The *GoogleDrive.SetActiveFolder* method lets you set and change the present wor
 **Example:**
 
     CALL GoogleDrive.StoreQVD('Sales', Qlik/QVD/Transformed', 'Sales.qvd', -1);  // Store and drop table
-    
     CALL GoogleDrive.StoreQVD('Sales', Qlik/QVD/Transformed', 'Sales.qvd');      // Store and keep table
     CALL GoogleDrive.StoreQVD('Sales', Qlik/QVD/Transformed', 'Sales.qvd', 0);   // Store and keep table
 <br />
