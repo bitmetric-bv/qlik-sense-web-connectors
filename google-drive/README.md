@@ -104,14 +104,14 @@ The *GoogleDrive.SetActiveFolder* method lets you set and change the present wor
 <br />
 |Parameter|Description|In/Out|Optional|
 |--|--|--|--|
-|pIndex|Index of the file in the folder. Possible values range from zero to *GoogleDrive.ActiveFolder.NoOfFiles - 1* |In|No|
+|pIndex|Index of the file in the folder. Possible values range from zero to *GoogleDrive.ActiveFolder.NoOfFiles - 1* **Watch out!** always enclose the index value between parentheses (), otherwise Qlik will interpret the value as a variable name and will create the variable.|In|No|
 |pVarReturn|Name of the variable where the name of the file is output to|Out|No|
 
 **Example:**
 
     FOR i = 0 TO $(GoogleDrive.ActiveFolder.NoOfFiles) - 1
     
-        CALL ActiveFolder.GetFilenameByIndex($(i), 'vFilename');
+        CALL ActiveFolder.GetFilenameByIndex(($(i)), 'vFilename');
         
         Data:
         LOAD
