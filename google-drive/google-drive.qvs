@@ -176,7 +176,7 @@ END SUB
 
 SUB GoogleDrive.GetFileId(pPath, pFilename, pVarReturn)
 
-	// Fetch the Folder ID for a file in a path
+	// Fetch the File ID for a file in a path
 
 	[GoogleDrive.GetFileId.File]:
     LOAD
@@ -196,7 +196,26 @@ END SUB
 
 
 
+SUB GoogleDrive.FileExists(pPath, pFilename, pVarReturn)
+
+	// Check if a given file exists within a path
+	CALL GoogleDrive.GetFileId('$(pPath)', '$(pFilename)', 'GoogleDrive.FileExists.FileId');
+    
+    IF '$(GoogleDrive.FileExists.FileId)' = 'NOT_FOUND' THEN
+      LET $(pVarReturn) = 0;
+    ELSE
+      LET $(pVarReturn) = -1;
+    END IF
+    
+    LET GoogleDrive.FileExists.FileId = null();
+
+END SUB
+
+
+
 SUB GoogleDrive.GetFilesInPath(pPath, pTableReturn)
+
+    // To-do: check if the return tables exists. Add logic to either drop or concatenate if it does.
 
 	CALL GoogleDrive.FolderExists('$(pPath)', 'GoogleDrive.GetFilesInPath.FolderExists');
     
@@ -217,23 +236,6 @@ SUB GoogleDrive.GetFilesInPath(pPath, pTableReturn)
     END IF
     
     LET GoogleDrive.GetFilesInPath.FolderExists = null();
-
-END SUB
-
-
-
-SUB GoogleDrive.FileExists(pPath, pFilename, pVarReturn)
-
-	// Check if a given file exists within a path
-	CALL GoogleDrive.GetFileId('$(pPath)', '$(pFilename)', 'GoogleDrive.FileExists.FileId');
-    
-    IF '$(GoogleDrive.FileExists.FileId)' = 'NOT_FOUND' THEN
-      LET $(pVarReturn) = 0;
-    ELSE
-      LET $(pVarReturn) = -1;
-    END IF
-    
-    LET GoogleDrive.FileExists.FileId = null();
 
 END SUB
 
