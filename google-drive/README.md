@@ -116,7 +116,7 @@ The *GoogleDrive.SetActiveFolder* method lets you set and change the present wor
         Data:
         LOAD
             *
-        FROM [lib://$(GoogleDrive.DataConnection.Storage)/$(GoogleDrive.ActiveFolder.Id)/$(vFilename)]
+        FROM [$(GoogleDrive.ActiveFolder.LibString)/$(vFilename)]
         (qvd)
         ;
         

@@ -3,6 +3,7 @@ SUB GoogleDrive.Init(pDataConnection.Metadata, pDataConnection.Storage)
 	SET GoogleDrive.DataConnection.Metadata = '$(pDataConnection.Metadata)';
     SET GoogleDrive.DataConnection.Storage = '$(pDataConnection.Storage)';
     SET GoogleDrive.ActiveFolder.IsSet = 0;
+    LET GoogleDrive.ActiveFolder.LibString = 'lib://$(GoogleDrive.DataConnection.Storage)/' & chr(36) & '(GoogleDrive.ActiveFolder.Id)';
     
     TRACE >>> Caching Google Drive paths;
     CALL GoogleDrive.ListFiles('trashed = false and mimeType = "application/vnd.google-apps.folder"', 'GoogleDrive.Folders.Temp');
@@ -69,6 +70,7 @@ SUB GoogleDrive.Destroy
 	LET GoogleDrive.DataConnection.Metadata = null();
     LET GoogleDrive.DataConnection.Storage = null();
     LET GoogleDrive.ActiveFolder.IsSet = null();
+    LET GoogleDrive.ActiveFolder.LibString = null();
     LET GoogleDrive.ActiveFolder.Id = null();
     LET GoogleDrive.ActiveFolder.Path = null();
     LET GoogleDrive.ActiveFolder.NoOfFiles = null();
