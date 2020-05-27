@@ -2,6 +2,81 @@
 # Google Drive
 Reusable subroutines for dealing with Google Drive files in Qlik Sense.
 
+## Properties
+
+### GoogleDrive.ActiveFolder
+By using the *GoogleDrive.SetActiveFolder()* method, an 'active' folder can be set in Google Drive, this sets some additional properties to make it easier to work with the files in a single folder:
+<br />
+
+#### GoogleDrive.ActiveFolder.Files
+Qlik Sense table containing a list of all files in the *active* folder, as set with the *GoogleDrive.SetActiveFolder()* method. If no active folder is set, this table does not exist, and the *GoogleDrive.ActiveFolder.IsSet* property is set to 0 (false).
+<br />
+
+|Column|Description|
+|--|--|
+|GoogleDrive.ActiveFolder.Files.Id|ID of the file, as used in Google Drive|
+|GoogleDrive.ActiveFolder.Files.Filename|Name of the file, including extension|
+|GoogleDrive.ActiveFolder.Files.FileExtension|Extension of the filename|
+|GoogleDrive.ActiveFolder.Files.FileSize|Size of the file, in bytes|
+<br />
+
+#### GoogleDrive.ActiveFolder.Id
+The ID of the active folder, as used in Google Drive.
+<br />
+
+#### GoogleDrive.ActiveFolder.IsSet
+Indicates if an active folder is set -1 for true, and 0 for false. If this property is false, the other properties will be blank as well (i.e. the table *GoogleDrive.ActiveFolder.Files* will not exist)
+<br />
+
+#### GoogleDrive.ActiveFolder.LibString
+The complete library / data connection string for the active folder, including the 'lib://' text, excluding the filename.
+<br />
+
+#### GoogleDrive.ActiveFolder.NoOfFiles
+The number of files in the active folder. Useful for looping through the files in the active folder using the *GoogleDrive.ActiveFolder.GetFilenameByIndex()* method.
+<br />
+
+#### GoogleDrive.ActiveFolder.Path
+The path of the active folder, in human readable form.
+<br />
+
+### GoogleDrive.DataConnection.Metadata
+The name of the data connection for the Google Drive metadata connector.
+<br />
+
+### GoogleDrive.DataConnection.Storage
+The name of the data connection for the Google Drive storage / file connector.
+<br />
+
+### GoogleDrive.Files
+Qlik Sense table containing a list of all files in Google Drive, excluding those that were trashed.
+
+|Column|Description|
+|--|--|
+|GoogleDrive.Files.Id|ID of the file, as used in Google Drive|
+|GoogleDrive.Files.Filename|Name of the file, including extension|
+|GoogleDrive.Files.FileExtension|Extension of the filename|
+|GoogleDrive.Files.FileSize|Size of the file, in bytes|
+|GoogleDrive.Files.FolderId|Id of the folder where the file resides|
+|GoogleDrive.Files.Path|Path of the folder where the file resides|
+<br />
+
+### GoogleDrive.Folders
+Qlik Sense table containing a list of all folders in Google Drive, excluding those that were trashed.
+
+|Column|Description|
+|--|--|
+|GoogleDrive.Folder.Id|ID of the folder, as used in Google Drive|
+|GoogleDrive.Folder.Name|Name of the folder|
+|GoogleDrive.Folder.ParentId|ID of the parent of the folder|
+|GoogleDrive.Folder.Name1|Name of the root folder|
+|GoogleDrive.Folder.Name2 ... NameX|Name of the underlying folders, up to and including the current folder|
+|GoogleDrive.Folder.ParentName|Name of the parent of the folder|
+|GoogleDrive.Folder.Path|The complete path of the folder, separated by /|
+|GoogleDrive.Folder.PathDept|The path dept of the current folder|
+<br />
+
+
 ## Methods
 GoogleDrive.qvs contains the following methods (subroutines)  
 <br />
