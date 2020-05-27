@@ -6,7 +6,7 @@ Reusable subroutines for dealing with Google Drive files in Qlik Sense.
 
 ### GoogleDrive.ActiveFolder
 By using the *GoogleDrive.SetActiveFolder()* method, an 'active' folder can be set in Google Drive, this sets some additional properties to make it easier to work with the files in a single folder:
-<br />
+<br /><br />
 
 #### GoogleDrive.ActiveFolder.Files
 Qlik Sense table containing a list of all files in the *active* folder, as set with the *GoogleDrive.SetActiveFolder()* method. If no active folder is set, this table does not exist, and the *GoogleDrive.ActiveFolder.IsSet* property is set to 0 (false).
@@ -22,31 +22,31 @@ Qlik Sense table containing a list of all files in the *active* folder, as set w
 
 #### GoogleDrive.ActiveFolder.Id
 The ID of the active folder, as used in Google Drive.
-<br />
+<br /><br />
 
 #### GoogleDrive.ActiveFolder.IsSet
 Indicates if an active folder is set -1 for true, and 0 for false. If this property is false, the other properties will be blank as well (i.e. the table *GoogleDrive.ActiveFolder.Files* will not exist)
-<br />
+<br /><br />
 
 #### GoogleDrive.ActiveFolder.LibString
 The complete library / data connection string for the active folder, including the 'lib://' text, excluding the filename.
-<br />
+<br /><br />
 
 #### GoogleDrive.ActiveFolder.NoOfFiles
 The number of files in the active folder. Useful for looping through the files in the active folder using the *GoogleDrive.ActiveFolder.GetFilenameByIndex()* method.
-<br />
+<br /><br />
 
 #### GoogleDrive.ActiveFolder.Path
 The path of the active folder, in human readable form.
-<br />
+<br /><br />
 
 ### GoogleDrive.DataConnection.Metadata
 The name of the data connection for the Google Drive metadata connector.
-<br />
+<br /><br />
 
 ### GoogleDrive.DataConnection.Storage
 The name of the data connection for the Google Drive storage / file connector.
-<br />
+<br /><br />
 
 ### GoogleDrive.Files
 Qlik Sense table containing a list of all files in Google Drive, excluding those that were trashed.
