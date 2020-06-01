@@ -267,3 +267,27 @@ SUB GoogleDrive.StoreQVD(pTable, pPath, pFilename, pDropAfterStore)
 
 
 END SUB
+
+
+SUB GoogleDrive.ActiveFolder.ForEachFile(pSub)
+
+    FOR GoogleDrive.ActiveFolder.FileIndex = 0 TO $(GoogleDrive.ActiveFolder.NoOfFiles) - 1
+
+	    LET GoogleDrive.ActiveFolder.ForEachFile.Progress = repeat(chr(9608), round(((GoogleDrive.ActiveFolder.FileIndex + 1) / GoogleDrive.ActiveFolder.NoOfFiles) * 40));
+        LET GoogleDrive.ActiveFolder.ForEachFile.Remaining = repeat(chr(9617), 40 - len('$(GoogleDrive.ActiveFolder.ForEachFile.Progress)'));
+        LET GoogleDrive.ActiveFolder.ForEachFile.Percentage = num((GoogleDrive.ActiveFolder.FileIndex + 1) / GoogleDrive.ActiveFolder.NoOfFiles, '0.00%');
+    
+        TRACE $(GoogleDrive.ActiveFolder.ForEachFile.Progress)$(GoogleDrive.ActiveFolder.ForEachFile.Remaining) $(GoogleDrive.ActiveFolder.ForEachFile.Percentage);
+
+        CALL GoogleDrive.ActiveFolder.GetFilenameByIndex(($(GoogleDrive.ActiveFolder.FileIndex)), 'GoogleDrive.ActiveFolder.FileIndex.Filename');
+        CALL $(pSub)('$(GoogleDrive.ActiveFolder.LibString)/$(GoogleDrive.ActiveFolder.FileIndex.Filename)');
+    
+    NEXT
+
+    LET GoogleDrive.ActiveFolder.FileIndex = null();
+    LET GoogleDrive.ActiveFolder.FileIndex.Filename = null();
+    LET GoogleDrive.ActiveFolder.ForEachFile.Progress = null();
+    LET GoogleDrive.ActiveFolder.ForEachFile.Remaining = null();
+    LET GoogleDrive.ActiveFolder.ForEachFile.Percentage = null();
+
+END SUB
