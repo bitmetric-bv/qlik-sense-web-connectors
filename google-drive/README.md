@@ -263,3 +263,25 @@ The *GoogleDrive.SetActiveFolder* method lets you set and change the present wor
     CALL GoogleDrive.StoreQVD('Sales', Qlik/QVD/Transformed', 'Sales.qvd');      // Store and keep table
     CALL GoogleDrive.StoreQVD('Sales', Qlik/QVD/Transformed', 'Sales.qvd', 0);   // Store and keep table
 <br />
+
+
+### GoogleDrive.ActiveFolder.ForEachFile
+
+**Description:** Run a subroutine, specified by the *pSub* parameter for each file in the currently active folder.
+<br />
+<br />
+|Parameter|Description|In/Out|Optional|
+|--|--|--|--|
+|pSub|The name of the subroutine to call for each file. This subroutine must take the name of a file, including the entire connection string, as its first (and only) parameter|In|No|
+
+**Example:**
+    
+    SUB LoadFile(pFilename)
+        
+        Data:
+        LOAD * FROM [$(pFilename)] (qvd);
+    
+    END SUB
+
+    CALL GoogleDrive.ActiveFolder.ForEachFile('LoadFile');
+<br />
