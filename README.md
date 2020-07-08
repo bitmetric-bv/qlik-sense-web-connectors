@@ -1,2 +1,2 @@
 # qlik-sense-web-connectors
-Methods and examples for working with Qlik Sense Web Connectors
+Methods and examples for working with Qlik Sense Web Connectors in Qlik Sense Business
