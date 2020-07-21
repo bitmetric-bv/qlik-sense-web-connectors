@@ -3,12 +3,14 @@
 Reusable subroutines for dealing with Google Drive files in Qlik Sense Business (SaaS).
 
 ## Properties
+Properties are either stored in a table or a variable.
 
-### GoogleDrive.ActiveFolder
+
+### GoogleDrive.ActiveFolder  ![Type](https://img.shields.io/static/v1.svg?label=type&message=variable&color=blue)
 By using the *GoogleDrive.SetActiveFolder()* method, an 'active' folder can be set in Google Drive, this sets some additional properties to make it easier to work with the files in a single folder:
 <br /><br />
 
-#### GoogleDrive.ActiveFolder.Files
+#### GoogleDrive.ActiveFolder.Files  ![Type](https://img.shields.io/static/v1.svg?label=type&message=table&color=blue)
 Qlik Sense table containing a list of all files in the *active* folder, as set with the *GoogleDrive.SetActiveFolder()* method. If no active folder is set, this table does not exist, and the *GoogleDrive.ActiveFolder.IsSet* property is set to 0 (false).
 <br />
 
@@ -20,35 +22,35 @@ Qlik Sense table containing a list of all files in the *active* folder, as set w
 |GoogleDrive.ActiveFolder.Files.FileSize|Size of the file, in bytes|
 <br />
 
-#### GoogleDrive.ActiveFolder.Id
+#### GoogleDrive.ActiveFolder.Id  ![Type](https://img.shields.io/static/v1.svg?label=type&message=variable&color=blue)
 The ID of the active folder, as used in Google Drive.
 <br /><br />
 
-#### GoogleDrive.ActiveFolder.IsSet
+#### GoogleDrive.ActiveFolder.IsSet  ![Type](https://img.shields.io/static/v1.svg?label=type&message=variable&color=blue)
 Indicates if an active folder is set -1 for true, and 0 for false. If this property is false, the other properties will be blank as well (i.e. the table *GoogleDrive.ActiveFolder.Files* will not exist)
 <br /><br />
 
-#### GoogleDrive.ActiveFolder.LibString
+#### GoogleDrive.ActiveFolder.LibString  ![Type](https://img.shields.io/static/v1.svg?label=type&message=variable&color=blue)
 The complete library / data connection string for the active folder, including the 'lib://' text, excluding the filename.
 <br /><br />
 
-#### GoogleDrive.ActiveFolder.NoOfFiles
+#### GoogleDrive.ActiveFolder.NoOfFiles  ![Type](https://img.shields.io/static/v1.svg?label=type&message=variable&color=blue)
 The number of files in the active folder. Useful for looping through the files in the active folder using the *GoogleDrive.ActiveFolder.GetFilenameByIndex()* method.
 <br /><br />
 
-#### GoogleDrive.ActiveFolder.Path
+#### GoogleDrive.ActiveFolder.Path  ![Type](https://img.shields.io/static/v1.svg?label=type&message=variable&color=blue)
 The path of the active folder, in human readable form.
 <br /><br />
 
-### GoogleDrive.DataConnection.Metadata
+### GoogleDrive.DataConnection.Metadata  ![Type](https://img.shields.io/static/v1.svg?label=type&message=variable&color=blue)
 The name of the data connection for the Google Drive metadata connector.
 <br /><br />
 
-### GoogleDrive.DataConnection.Storage
+### GoogleDrive.DataConnection.Storage  ![Type](https://img.shields.io/static/v1.svg?label=type&message=variable&color=blue)
 The name of the data connection for the Google Drive storage / file connector.
 <br /><br />
 
-### GoogleDrive.Files
+### GoogleDrive.Files  ![Type](https://img.shields.io/static/v1.svg?label=type&message=table&color=blue)
 Qlik Sense table containing a list of all files in Google Drive, excluding those that were trashed.
 
 |Column|Description|
@@ -61,7 +63,7 @@ Qlik Sense table containing a list of all files in Google Drive, excluding those
 |GoogleDrive.Files.Path|Path of the folder where the file resides|
 <br />
 
-### GoogleDrive.Folders
+### GoogleDrive.Folders  ![Type](https://img.shields.io/static/v1.svg?label=type&message=table&color=blue)
 Qlik Sense table containing a list of all folders in Google Drive, excluding those that were trashed.
 
 |Column|Description|
